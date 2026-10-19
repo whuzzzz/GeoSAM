@@ -1,0 +1,23 @@
+# Python and tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+
+# Local datasets, logs, results, and checkpoints
+data/
+logs/
+results*/
+outputs/
+weights/*
+!weights/README.md
+*.ckpt
+*.pth
+*.pt
+*.safetensors
+
+# Local experiment tracking
+wandb/

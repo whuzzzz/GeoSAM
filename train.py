@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+# Set CUDA_VISIBLE_DEVICES in the shell when selecting GPUs.
 os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
 import math
 import argparse
@@ -22,7 +22,7 @@ from src.config.default import get_cfg_defaults
 from src.utils.misc import get_rank_zero_only_logger, setup_gpus
 from src.utils.profiler import build_profiler
 from src.lightning.data import MultiSceneDataModule
-from src.lightning.lightning_geosam import PL_GeoSAM
+from src.lightning.lightning_xoftr import PL_XoFTR
 
 loguru_logger = get_rank_zero_only_logger(loguru_logger)
 
@@ -84,19 +84,19 @@ def main():
     
     # lightning module
     profiler = build_profiler(args.profiler_name)
-    model = PL_GeoSAM(config, pretrained_ckpt=args.ckpt_path, profiler=profiler)
-    loguru_logger.info(f"GeoSAM LightningModule initialized!")
+    model = PL_XoFTR(config, pretrained_ckpt=args.ckpt_path, profiler=profiler)
+    loguru_logger.info(f"XoFTR LightningModule initialized!")
     
     # lightning data
     data_module = MultiSceneDataModule(args, config)
-    loguru_logger.info(f"GeoSAM DataModule initialized!")
+    loguru_logger.info(f"XoFTR DataModule initialized!")
     
     # TensorBoard Logger
     logger = [TensorBoardLogger(save_dir='logs/tb_logs', name=args.exp_name, default_hp_metric=False)]
     ckpt_dir = Path(logger[0].log_dir) / 'checkpoints'
     if config.TRAINER.USE_WANDB:
         logger.append(WandbLogger(name=args.exp_name + f"_{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}",
-                                project='GeoSAM'))
+                                project='XoFTR'))
     
     # Callbacks
     # TODO: update ModelCheckpoint to monitor multiple metrics

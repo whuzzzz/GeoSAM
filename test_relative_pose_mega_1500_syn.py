@@ -343,7 +343,7 @@ def eval_relapose(
 
 def test_relative_pose_vissyn(
         data_root_dir,
-        method="geosam",
+        method="xoftr",
         exp_name="VisSYN",
         ransac_thres=1.5,
         print_out=False,
@@ -457,10 +457,10 @@ if __name__ == '__main__':
 
 
     def add_method_arguments(parser, method):
-        if method == "geosam":
+        if method == "xoftr":
             parser.add_argument('--match_threshold', type=float, default=0.3)
             parser.add_argument('--fine_threshold', type=float, default=0.1)
-            parser.add_argument('--ckpt', type=str, default="/data1/weipengcheng/XoFTR-main/logs/tb_logs/train20260104coarsematch_convnextv2_pico/version_0/checkpoints/epoch=16-auc@5=0.181-auc@10=0.336-auc@20=0.498.ckpt")
+            parser.add_argument('--ckpt', type=str, default="./logs/tb_logs/train20260104coarsematch_convnextv2_pico/version_0/checkpoints/epoch=16-auc@5=0.181-auc@10=0.336-auc@20=0.498.ckpt")
 
         elif method == "loftr":
             parser.add_argument('--ckpt', type=str,
@@ -499,10 +499,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Benchmark Relative Pose')
 
-    parser.add_argument('--method', type=str, default="geosam",
-                        choices=["geosam", 'sp_lg', 'loftr', 'roma', 'eloftr', 'xfeat', 'omniglue', 'reasoning_xfeat',
+    parser.add_argument('--method', type=str, default="xoftr",
+                        choices=["xoftr", 'sp_lg', 'loftr', 'roma', 'eloftr', 'xfeat', 'omniglue', 'reasoning_xfeat',
                                  'semaglue'],
-                        help="Select the method to use: geosam, sp_lg, loftr, roma")
+                        help="Select the method to use: xoftr, sp_lg, loftr, roma")
 
     args, remaining_args = parser.parse_known_args()
 
@@ -516,7 +516,7 @@ if __name__ == '__main__':
         save_dir = osp.join(args.save_dir, args.e_name)
     else:
         save_dir = args.save_dir
-    os.environ['CUDA_VISIBLE_DEVICES'] = "2"
+# Set CUDA_VISIBLE_DEVICES in the shell when selecting GPUs.
     tt = time.time()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

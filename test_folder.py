@@ -1,6 +1,6 @@
 import json
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+# Set CUDA_VISIBLE_DEVICES in the shell when selecting GPUs.
 import torch
 import cv2
 import numpy as np
@@ -9,7 +9,9 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from src.utils.plotting import make_matching_figure
 
-from src.geosam import GeoSAM
+from src.xoftr import XoFTR, XoFTR_dino_resnet_panmatch_light_withfpn, XoFTR_Light_convnextv2, XoFTR_Light,XoFTR_dino_resnet_panmatch_light_withfpn,GeoSAM
+from src.xoftr import XoFTR_dino_resnet_panmatch_without_fpn, GeoSAM_without_RopE, GeoSAM, GeoSAM_reverse_GGSA, \
+        GeoSAM_ablation_structure
 from src.config.default import get_cfg_defaults
 from src.utils.data_io import DataIOWrapper, lower_config
 import time
@@ -208,28 +210,28 @@ if __name__ == "__main__":
     config = lower_config(config)
 
     # Coarse level threshold
-    config['geosam']['match_coarse']['thr'] = 0.3  # Default 0.3
+    config['xoftr']['match_coarse']['thr'] = 0.3  # Default 0.3
 
     # Fine level threshold
-    config['geosam']['fine']['thr'] = 0.1  # Default 0.1
+    config['xoftr']['fine']['thr'] = 0.1  # Default 0.1
 
     # It is posseble to get denser matches
-    # If True, geosam returns all fine-level matches for each fine-level window (at 1/2 resolution)
-    config['geosam']['fine']['denser'] = False  # Default False
+    # If True, xoftr returns all fine-level matches for each fine-level window (at 1/2 resolution)
+    config['xoftr']['fine']['denser'] = False  # Default False
 
     # XoFTR model
-    # matcher = XoFTR_dino_resnet_panmatch_light_withfpn(config=config["geosam"])
-    matcher = GeoSAM(config=config["geosam"])
+    # matcher = XoFTR_dino_resnet_panmatch_light_withfpn(config=config["xoftr"])
+    matcher = XoFTR_dino_resnet_panmatch_light_withfpn(config=config["xoftr"])
 
-    # The input image sizes for geosam
+    # The input image sizes for xoftr
     # Note: The output matches and output images are in original image size
     config['test']['img0_resize'] = 640  # resize the longer side, None for no resize
     config['test']['img1_resize'] = 640  # resize the longer side, None for no resize
 
     # The path for weights
-    # ckpt = "/data1/weipengcheng/XoFTR-main/logs/tb_logs/train20260128dinov3_vitb_resnet_panmatch_light/version_1没有预训练/checkpoints/epoch=25-auc@5=0.194-auc@10=0.368-auc@20=0.540.ckpt"
-    # ckpt = "/data1/weipengcheng/dinomatch/logs/tb_logs/dinomatch/version_32/checkpoints/epoch=27-auc@5=0.206-auc@10=0.378-auc@20=0.554.ckpt"
-    ckpt = "/data1/weipengcheng/dinomatch/logs/tb_logs/dinomatch/version_32/checkpoints/epoch=27-auc@5=0.206-auc@10=0.378-auc@20=0.554.ckpt"
+    # ckpt = "./logs/tb_logs/train20260128dinov3_vitb_resnet_panmatch_light/version_1没有预训练/checkpoints/epoch=25-auc@5=0.194-auc@10=0.368-auc@20=0.540.ckpt"
+    # ckpt = "./logs/tb_logs/dinomatch/version_32/checkpoints/epoch=27-auc@5=0.206-auc@10=0.378-auc@20=0.554.ckpt"
+    ckpt = "./logs/tb_logs/dinomatch/version_32/checkpoints/epoch=27-auc@5=0.206-auc@10=0.378-auc@20=0.554.ckpt"
     # ckpt = r"C:\Users\PC\Desktop\fsdownload\epoch=8-auc@5=0.153-auc@10=0.283-auc@20=0.435.ckpt"
 
     # Data I/O wrapper
@@ -267,7 +269,7 @@ if __name__ == "__main__":
             # 剔除误差超过三个像素的匹配点，同时计算rmse和pcr
             rmse, filtered_pts1, filtered_pts2 = calculate_rmse_with_homography_and_filtering(mkpts0, mkpts1,
                                                                                               threshold=3.0)
-            output_path1 = '/data1/weipengcheng/dinomatch/isprs_ablation/reviewer_5/opt-sar'
+            output_path1 = './isprs_ablation/reviewer_5/opt-sar'
             os.makedirs(output_path1, exist_ok=True)
             output_path = os.path.join(output_path1, f"{idx + 1}_match_{len(filtered_pts1)}.png")
             # fig = draw_matches(img0_pth, img1_pth, filtered_pts1, filtered_pts2, output_path)

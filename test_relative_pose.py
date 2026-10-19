@@ -17,26 +17,26 @@ from src.utils.plotting import dynamic_alpha, error_colormap, make_matching_figu
 # Loading functions for methods
 ####################################################################
 def load_xoftr(args):
-    # from src.geosam import XoFTR_Light_convnextv2
-    from src.geosam import XoFTR_dino, XoFTR_dino_resnet, XoFTR_dino_resnet_panmatch, XoFTR_dino_resnet_panmatch_light, XoFTR_dino_resnet_panmatch_light_withfpn
+    # from src.xoftr import XoFTR_Light_convnextv2
+    from src.xoftr import XoFTR_dino, XoFTR_dino_resnet, XoFTR_dino_resnet_panmatch, XoFTR_dino_resnet_panmatch_light, XoFTR_dino_resnet_panmatch_light_withfpn
 
-    from src.geosam import GeoSAM, GeoSAM_without_RopE, GeoSAM, GeoSAM_reverse_GGSA, \
+    from src.xoftr import XoFTR_dino_resnet_panmatch_without_fpn, GeoSAM_without_RopE, GeoSAM, GeoSAM_reverse_GGSA, \
         GeoSAM_ablation_structure
-    # from src.geosam import XoFTR
+    # from src.xoftr import XoFTR
     from src.config.default import get_cfg_defaults
     from src.utils.data_io import DataIOWrapper, lower_config
     config = get_cfg_defaults(inference=True)
     config = lower_config(config)
-    config["geosam"]["match_coarse"]["thr"] = args.match_threshold
-    config["geosam"]["fine"]["thr"] = args.fine_threshold
+    config["xoftr"]["match_coarse"]["thr"] = args.match_threshold
+    config["xoftr"]["fine"]["thr"] = args.fine_threshold
     ckpt = args.ckpt
-    # matcher = XoFTR(config=config["geosam"])
-    # matcher = XoFTR_dino(config=config["geosam"])
-    # matcher = XoFTR_dino_resnet(config=config["geosam"])
-    matcher = GeoSAM_ablation_structure(config=config["geosam"])
-    # matcher = XoFTR_dino_resnet_panmatch_light_withfpn(config=config["geosam"])
-    # matcher = XoFTR_Light_convnextv2(config=config["geosam"])
-    # matcher = XoFTR_Light(config=config["geosam"])
+    # matcher = XoFTR(config=config["xoftr"])
+    # matcher = XoFTR_dino(config=config["xoftr"])
+    # matcher = XoFTR_dino_resnet(config=config["xoftr"])
+    matcher = GeoSAM_ablation_structure(config=config["xoftr"])
+    # matcher = XoFTR_dino_resnet_panmatch_light_withfpn(config=config["xoftr"])
+    # matcher = XoFTR_Light_convnextv2(config=config["xoftr"])
+    # matcher = XoFTR_Light(config=config["xoftr"])
     matcher = DataIOWrapper(matcher, config=config["test"], ckpt=ckpt)
 
     return matcher.from_paths
@@ -229,11 +229,11 @@ def eval_relapose(
 
 def test_relative_pose_vistir(
     data_root_dir,
-    method="geosam",
+    method="xoftr",
     exp_name = "VisTIR",
     ransac_thres=1.5,
     print_out=False,
-    save_dir="/data1/weipengcheng/XoFTR-main/results_relative_pose",
+    save_dir="./results_relative_pose",
     save_figs=False,
     debug=False,
     args=None
@@ -305,22 +305,22 @@ if __name__ == '__main__':
     def add_common_arguments(parser):
         parser.add_argument('--gpu', '-gpu', type=str, default='6')
         parser.add_argument('--exp_name', type=str, default="VisTIR")
-        parser.add_argument('--method', type=str, default="geosam")
-        parser.add_argument('--data_root_dir', type=str, default="/data1/weipengcheng/XoFTR-main/data/METU_VisTIR/")
-        parser.add_argument('--save_dir', type=str, default="/data1/weipengcheng/dinomatch/isprs_ablation/results_relative_pose")
+        parser.add_argument('--method', type=str, default="xoftr")
+        parser.add_argument('--data_root_dir', type=str, default="./data/METU_VisTIR/")
+        parser.add_argument('--save_dir', type=str, default="./isprs_ablation/results_relative_pose")
         parser.add_argument('--ransac_thres', type=float, default=1.5)
         parser.add_argument('--print_out', action='store_true')
         parser.add_argument('--debug', action='store_true')
         parser.add_argument('--save_figs', action='store_true')
         parser.add_argument('--match_threshold', type=float, default=0.3)
         parser.add_argument('--fine_threshold', type=float, default=0.1)
-        parser.add_argument('--ckpt', type=str, default="/data1/weipengcheng/dinomatch/logs/tb_logs/dinomatch/version_51_Standard_Cross_Attention/checkpoints/epoch=20-clean.ckpt")
+        parser.add_argument('--ckpt', type=str, default="./logs/tb_logs/dinomatch/version_51_Standard_Cross_Attention/checkpoints/epoch=20-clean.ckpt")
     
     def add_xoftr_arguments(subparsers):
-        subcommand = subparsers.add_parser('geosam')
+        subcommand = subparsers.add_parser('xoftr')
         # # subcommand.add_argument('--match_threshold', type=float, default=0.3)
         # # subcommand.add_argument('--fine_threshold', type=float, default=0.1)
-        # # subcommand.add_argument('--ckpt', type=str, default="/data1/weipengcheng/XoFTR-main/logs/tb_logs/train20251213onlycoarsematching/version_0/checkpoints/epoch=15-auc@5=0.219-auc@10=0.391-auc@20=0.560.ckpt")
+        # # subcommand.add_argument('--ckpt', type=str, default="./logs/tb_logs/train20251213onlycoarsematching/version_0/checkpoints/epoch=15-auc@5=0.219-auc@10=0.391-auc@20=0.560.ckpt")
         add_common_arguments(subcommand)
 
     parser = argparse.ArgumentParser(description='Benchmark Relative Pose')
@@ -331,8 +331,7 @@ if __name__ == '__main__':
     add_xoftr_arguments(subparsers)
     
     args = parser.parse_args()
-
-    os.environ['CUDA_VISIBLE_DEVICES'] = "5"
+# Set CUDA_VISIBLE_DEVICES in the shell when selecting GPUs.
     tt = time.time()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

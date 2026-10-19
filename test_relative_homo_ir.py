@@ -611,7 +611,7 @@ def aggregate_precisions(precs, precs_no_inlier):
 
 
 def test_relative_pose_visdepth(
-        method="geosam",
+        method="xoftr",
         exp_name="VisDepth",
         ransac_thres=1.5,
         print_out=False,
@@ -724,12 +724,12 @@ if __name__ == '__main__':
 
 
     def add_method_arguments(parser, method):
-        if method == "geosam":
+        if method == "xoftr":
             parser.add_argument('--match_threshold', type=float, default=0.3)
             parser.add_argument('--fine_threshold', type=float, default=0.1)
-            # parser.add_argument('--ckpt', type=str, default="/data1/weipengcheng/dinomatch/logs/tb_logs/dinomatch/version_32/checkpoints/epoch=27-auc@5=0.206-auc@10=0.378-auc@20=0.554.ckpt")
+            # parser.add_argument('--ckpt', type=str, default="./logs/tb_logs/dinomatch/version_32/checkpoints/epoch=27-auc@5=0.206-auc@10=0.378-auc@20=0.554.ckpt")
             parser.add_argument('--ckpt', type=str,
-                                default="/data1/weipengcheng/dinomatch/logs/tb_logs/dinomatch/version_48_fixed_laplacian/checkpoints/epoch=22-clean.ckpt")
+                                default="./logs/tb_logs/dinomatch/version_48_fixed_laplacian/checkpoints/epoch=22-clean.ckpt")
             # parser.add_argument('--ckpt', type=str, default="./weights/minima_xoftr.ckpt")
 
         elif method == "loftr":
@@ -771,10 +771,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Benchmark Relative Pose')
 
-    parser.add_argument('--method', type=str, default="geosam",
-                        choices=["geosam", 'sp_lg', 'loftr', 'roma', 'eloftr', 'xfeat', 'omniglue', 'reasoning_xfeat',
+    parser.add_argument('--method', type=str, default="xoftr",
+                        choices=["xoftr", 'sp_lg', 'loftr', 'roma', 'eloftr', 'xfeat', 'omniglue', 'reasoning_xfeat',
                                  'semaglue'],
-                        help="Select the method to use: geosam, sp_lg, loftr, roma")
+                        help="Select the method to use: xoftr, sp_lg, loftr, roma")
 
     args, remaining_args = parser.parse_known_args()
 
@@ -788,7 +788,7 @@ if __name__ == '__main__':
         save_dir = osp.join(args.save_dir, args.e_name)
     else:
         save_dir = args.save_dir
-    os.environ['CUDA_VISIBLE_DEVICES'] = "1"
+# Set CUDA_VISIBLE_DEVICES in the shell when selecting GPUs.
     tt = time.time()
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

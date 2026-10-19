@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "2, 3, 4, 5, 7"
+# Set CUDA_VISIBLE_DEVICES in the shell when selecting GPUs.
 os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
 import math
 import argparse
@@ -20,7 +20,7 @@ from src.config.default import get_cfg_defaults
 from src.utils.misc import get_rank_zero_only_logger, setup_gpus
 from src.utils.profiler import build_profiler
 from src.lightning.data_pretrain import PretrainDataModule
-from src.lightning.lightning_geosam_pretrain import PL_XoFTR_Pretrain
+from src.lightning.lightning_xoftr_pretrain import PL_XoFTR_Pretrain
 
 loguru_logger = get_rank_zero_only_logger(loguru_logger)
 

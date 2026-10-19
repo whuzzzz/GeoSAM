@@ -1,0 +1,3 @@
+GeoSAM is developed for the paper "GeoSAM: Geometry-Guided Semantic Alignment and Saliency-Aware State Space Model for Generalizable Cross-Modal Image Matching".
+
+Parts of the implementation build on the public XoFTR and LoFTR codebases. See LICENSE and the source-file comments for upstream attribution and license terms.
